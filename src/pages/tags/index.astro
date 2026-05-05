@@ -1,0 +1,34 @@
+---
+import { getPublishedPosts, getTagCollection } from "../../lib/posts";
+import { withBase } from "../../lib/url";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const posts = await getPublishedPosts();
+const tags = getTagCollection(posts);
+---
+
+<BaseLayout
+  title="Tags"
+  description="Browse posts by tag across tutorials, notes, and essays."
+  canonicalPath="/tags/"
+>
+  <section class="page-intro">
+    <p class="section-heading__eyebrow">Topics</p>
+    <h1>Tags keep the archive browsable.</h1>
+    <p>
+      {tags.length} tags across {posts.length} posts. Categories stay visible on posts, while tags
+      do the heavy lifting for navigation.
+    </p>
+  </section>
+
+  <div class="pill-grid">
+    {
+      tags.map((tag) => (
+        <a class="tag-panel" href={withBase(`/tags/${tag.slug}/`)}>
+          <strong>{tag.label}</strong>
+          <span>{tag.count} post{tag.count === 1 ? "" : "s"}</span>
+        </a>
+      ))
+    }
+  </div>
+</BaseLayout>

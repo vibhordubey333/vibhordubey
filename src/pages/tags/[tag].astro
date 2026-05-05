@@ -1,0 +1,35 @@
+---
+import PostCard from "../../components/PostCard.astro";
+import { getPostsForTag, getPublishedPosts, getTagCollection, getTagLabel } from "../../lib/posts";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const tags = getTagCollection(posts);
+
+  return tags.map((tag) => ({
+    params: { tag: tag.slug },
+    props: { tagSlug: tag.slug, label: tag.label, posts }
+  }));
+}
+
+const { tagSlug, label, posts } = Astro.props;
+const tagPosts = getPostsForTag(posts, tagSlug);
+const tagLabel = label ?? getTagLabel(posts, tagSlug) ?? tagSlug;
+---
+
+<BaseLayout
+  title={`Tag: ${tagLabel}`}
+  description={`Posts tagged ${tagLabel}.`}
+  canonicalPath={`/tags/${tagSlug}/`}
+>
+  <section class="page-intro">
+    <p class="section-heading__eyebrow">Tag archive</p>
+    <h1>{tagLabel}</h1>
+    <p>{tagPosts.length} post{tagPosts.length === 1 ? "" : "s"} filed under this topic.</p>
+  </section>
+
+  <div class="post-grid">
+    {tagPosts.map((post) => <PostCard post={post} />)}
+  </div>
+</BaseLayout>

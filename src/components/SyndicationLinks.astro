@@ -1,0 +1,32 @@
+---
+interface SyndicationLink {
+  platform: string;
+  url: string;
+}
+
+interface Props {
+  links?: SyndicationLink[];
+}
+
+const { links = [] } = Astro.props;
+---
+
+{
+  links.length > 0 && (
+    <section class="syndication" aria-labelledby="syndication-heading">
+      <div class="section-heading">
+        <p class="section-heading__eyebrow">POSSE</p>
+        <h2 id="syndication-heading">Syndicated to</h2>
+      </div>
+      <ul class="syndication__list">
+        {links.map((link) => (
+          <li>
+            <a href={link.url} rel="noopener noreferrer">
+              {link.platform}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

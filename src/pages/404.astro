@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/url";
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The page you were looking for does not exist."
+  canonicalPath="/404/"
+  noindex={true}
+>
+  <section class="not-found">
+    <p class="section-heading__eyebrow">404</p>
+    <h1>That page drifted out of the archive.</h1>
+    <p>
+      The link may be old, the slug may have changed, or the page never existed in this site’s
+      current shape.
+    </p>
+    <a class="button" href={withBase("/")}>Return home</a>
+  </section>
+</BaseLayout>

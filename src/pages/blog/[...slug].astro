@@ -1,0 +1,89 @@
+---
+import { render } from "astro:content";
+import AuthorBio from "../../components/AuthorBio.astro";
+import Prose from "../../components/Prose.astro";
+import SyndicationLinks from "../../components/SyndicationLinks.astro";
+import TagList from "../../components/TagList.astro";
+import siteConfig from "../../config/site";
+import { formatDate, getPublishedPosts, type BlogEntry } from "../../lib/posts";
+import { absoluteUrl } from "../../lib/url";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post }
+  }));
+}
+
+interface Props {
+  post: BlogEntry;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const canonicalPath = `/blog/${post.id}/`;
+const modifiedTime = post.data.updatedDate ?? post.data.pubDate;
+const articleUrl = absoluteUrl(canonicalPath, Astro.site ?? siteConfig.origin);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: modifiedTime.toISOString(),
+  mainEntityOfPage: articleUrl,
+  url: articleUrl,
+  author: {
+    "@type": "Person",
+    name: siteConfig.author.name,
+    url: siteConfig.author.url
+  },
+  publisher: {
+    "@type": "Person",
+    name: siteConfig.author.name,
+    url: siteConfig.author.url
+  },
+  image: absoluteUrl(post.data.heroImage ?? siteConfig.defaultOgImage, Astro.site ?? siteConfig.origin),
+  articleSection: post.data.category ?? "Engineering",
+  keywords: post.data.tags.join(", ")
+};
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  canonicalPath={canonicalPath}
+  image={post.data.heroImage ?? siteConfig.defaultOgImage}
+  type="article"
+  publishedTime={post.data.pubDate}
+  modifiedTime={modifiedTime}
+  tags={post.data.tags}
+  jsonLd={jsonLd}
+>
+  <article class="post-shell">
+    <header class="post-header">
+      <p class="post-header__eyebrow">{post.data.type ?? "post"}</p>
+      <h1>{post.data.title}</h1>
+      <p class="post-header__lede">{post.data.description}</p>
+
+      <div class="post-header__meta">
+        <span>{formatDate(post.data.pubDate)}</span>
+        {post.data.updatedDate && <span>Updated {formatDate(post.data.updatedDate)}</span>}
+        {post.data.category && <span>{post.data.category}</span>}
+      </div>
+
+      <TagList tags={post.data.tags} />
+    </header>
+
+    <Prose>
+      <Content />
+    </Prose>
+
+    <SyndicationLinks links={post.data.syndicatedTo} />
+    <AuthorBio compact={true} />
+  </article>
+</BaseLayout>

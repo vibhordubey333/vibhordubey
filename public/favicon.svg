@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Vibhor Dubey favicon</title>
+  <desc id="desc">A warm neutral rounded square with teal code braces.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fffdf8" />
+      <stop offset="100%" stop-color="#ece4d8" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#bg)" />
+  <rect x="1.5" y="1.5" width="61" height="61" rx="16.5" fill="none" stroke="#cabdaa" />
+  <path
+    d="M25 19c-5 2-8 6-8 13s3 11 8 13M39 19c5 2 8 6 8 13s-3 11-8 13"
+    fill="none"
+    stroke="#2f6765"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="4.5"
+  />
+</svg>

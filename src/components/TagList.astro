@@ -1,0 +1,22 @@
+---
+import { slugifyTag } from "../lib/posts";
+import { withBase } from "../lib/url";
+
+interface Props {
+  tags: string[];
+}
+
+const { tags } = Astro.props;
+---
+
+<ul class="tag-list" aria-label="Post tags">
+  {
+    tags.map((tag) => (
+      <li>
+        <a class="tag" href={withBase(`/tags/${slugifyTag(tag)}/`)}>
+          {tag}
+        </a>
+      </li>
+    ))
+  }
+</ul>

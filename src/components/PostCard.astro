@@ -1,0 +1,32 @@
+---
+import type { BlogEntry } from "../lib/posts";
+import { formatDate } from "../lib/posts";
+import { withBase } from "../lib/url";
+import TagList from "./TagList.astro";
+
+interface Props {
+  post: BlogEntry;
+}
+
+const { post } = Astro.props;
+const href = withBase(`/blog/${post.id}/`);
+const primaryLabel = post.data.type ?? post.data.category ?? "Post";
+---
+
+<article class="post-card">
+  <div class="post-card__header">
+    <span class="post-card__eyebrow">{primaryLabel}</span>
+    <h2 class="post-card__title">
+      <a href={href}>{post.data.title}</a>
+    </h2>
+  </div>
+
+  <p class="post-card__summary">{post.data.description}</p>
+
+  <div class="post-card__meta">
+    <span>{formatDate(post.data.pubDate)}</span>
+    {post.data.updatedDate && <span>Updated {formatDate(post.data.updatedDate)}</span>}
+  </div>
+
+  <TagList tags={post.data.tags} />
+</article>

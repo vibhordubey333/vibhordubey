@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Field Notes by Vibhor Dubey social preview</title>
+  <desc id="desc">Editorial social card for the technical blog.</desc>
+  <defs>
+    <linearGradient id="panel" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fffdf8" />
+      <stop offset="100%" stop-color="#efe8de" />
+    </linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.15" r="0.8">
+      <stop offset="0%" stop-color="#dcebe7" />
+      <stop offset="100%" stop-color="#f6f3ee" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#glow)" />
+  <rect x="56" y="56" width="1088" height="518" rx="32" fill="url(#panel)" stroke="#d7ccbb" />
+  <rect x="96" y="96" width="112" height="112" rx="28" fill="#fffdf8" stroke="#d7ccbb" />
+  <path
+    d="M136 126c-16 6-24 18-24 34s8 28 24 34M168 126c16 6 24 18 24 34s-8 28-24 34"
+    fill="none"
+    stroke="#2f6765"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="8"
+  />
+  <text
+    x="96"
+    y="274"
+    fill="#2f6765"
+    font-family="Helvetica Neue, Arial, sans-serif"
+    font-size="28"
+    font-weight="700"
+    letter-spacing="5"
+  >
+    FIELD NOTES BY VIBHOR DUBEY
+  </text>
+  <text
+    x="96"
+    y="382"
+    fill="#171411"
+    font-family="Georgia, Times New Roman, serif"
+    font-size="76"
+    font-weight="600"
+  >
+    Publish on your own site first.
+  </text>
+  <text
+    x="96"
+    y="460"
+    fill="#5f594f"
+    font-family="Helvetica Neue, Arial, sans-serif"
+    font-size="34"
+  >
+    Technical writeups, tutorials, notes, and essays
+  </text>
+  <text
+    x="96"
+    y="510"
+    fill="#5f594f"
+    font-family="Helvetica Neue, Arial, sans-serif"
+    font-size="34"
+  >
+    with canonical URLs, RSS, and a calm GitHub-first workflow.
+  </text>
+</svg>

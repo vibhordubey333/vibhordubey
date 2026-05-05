@@ -1,0 +1,29 @@
+---
+import siteConfig from "../config/site";
+import { withBase } from "../lib/url";
+
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<aside class:list={["author-bio", compact && "author-bio--compact"]}>
+  <div class="author-bio__copy">
+    <p class="author-bio__eyebrow">Written by</p>
+    <h2 class="author-bio__name">{siteConfig.author.name}</h2>
+    <p class="author-bio__role">{siteConfig.author.role}</p>
+    <p class="author-bio__text">{siteConfig.author.bio}</p>
+  </div>
+
+  <ul class="social-links" aria-label="Author links">
+    {
+      siteConfig.socialLinks.map((link) => (
+        <li>
+          <a href={withBase(link.href)}>{link.label}</a>
+        </li>
+      ))
+    }
+  </ul>
+</aside>

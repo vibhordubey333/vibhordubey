@@ -1,0 +1,54 @@
+---
+import AuthorBio from "../components/AuthorBio.astro";
+import Prose from "../components/Prose.astro";
+import siteConfig from "../config/site";
+import { absoluteUrl } from "../lib/url";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: siteConfig.author.name,
+  jobTitle: siteConfig.author.role,
+  description: siteConfig.author.bio,
+  url: absoluteUrl("/about/", Astro.site ?? siteConfig.origin),
+  sameAs: [siteConfig.author.url]
+};
+---
+
+<BaseLayout
+  title="About"
+  description={`About ${siteConfig.author.name}, the voice behind ${siteConfig.title}.`}
+  canonicalPath="/about/"
+  jsonLd={jsonLd}
+>
+  <section class="page-intro">
+    <p class="section-heading__eyebrow">About</p>
+    <h1>The site exists to keep the original close at hand.</h1>
+    <p>
+      This is a calm home for technical writing: polished enough to feel deliberate, small enough
+      to stay maintainable.
+    </p>
+  </section>
+
+  <Prose>
+    <p>
+      I care about frontend systems that age well, publishing workflows that respect ownership, and
+      developer tools that reduce drag instead of adding ceremony. Most of what appears here starts
+      from working notes, turns into a practical draft, and eventually becomes something worth
+      syndicating.
+    </p>
+    <p>
+      The site follows a POSSE rhythm: publish on the personal site first, then share adapted
+      versions to places like Medium and dev.to with the canonical URL pointing back here. That
+      keeps the archive durable, searchable, and fully controlled in Git.
+    </p>
+    <p>
+      The stack is intentionally light: Astro for static pages, Markdown content collections for
+      posts, and GitHub Pages for deployment. The goal is not to build a publishing platform. The
+      goal is to keep writing friction low enough that good notes actually make it onto the web.
+    </p>
+  </Prose>
+
+  <AuthorBio />
+</BaseLayout>
