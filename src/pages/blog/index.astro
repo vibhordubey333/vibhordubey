@@ -8,13 +8,13 @@ const posts = await getPublishedPosts();
 
 <BaseLayout
   title="Blog"
-  description="Technical writeups, tutorials, notes, and essays published on the canonical site first."
+  description="Technical blog posts published on the canonical site first."
   canonicalPath="/blog/"
 >
   <section class="page-intro">
     <p class="section-heading__eyebrow">Archive</p>
     <h1>Technical writing with a durable home.</h1>
-    <p>{posts.length} published posts across tutorials, notes, and essays.</p>
+    <p>{posts.length} published blog posts.</p>
   </section>
 
   <div class="post-grid">
