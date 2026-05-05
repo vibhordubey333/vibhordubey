@@ -41,6 +41,104 @@ const {
 const currentPath = Astro.url.pathname;
 const homeHref = withBase("/");
 const year = new Date().getFullYear();
+const themeScript = `
+(() => {
+  const storageKey = "theme-preference";
+  const themeColors = ${JSON.stringify(siteConfig.themeColors)};
+  const root = document.documentElement;
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+  const getStoredTheme = () => {
+    try {
+      const storedTheme = localStorage.getItem(storageKey);
+      return storedTheme === "light" || storedTheme === "dark" ? storedTheme : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const getSystemTheme = () => (mediaQuery.matches ? "dark" : "light");
+
+  const updateToggleState = (theme) => {
+    const toggle = document.querySelector("[data-theme-toggle]");
+    if (!toggle) {
+      return;
+    }
+
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    const label = "Switch to " + nextTheme + " theme";
+    toggle.setAttribute("aria-label", label);
+    toggle.setAttribute("title", label);
+    toggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+  };
+
+  const applyTheme = (theme, persist = false) => {
+    root.dataset.theme = theme;
+    root.style.colorScheme = theme;
+
+    const themeMeta = document.querySelector("meta[data-theme-color]");
+    if (themeMeta) {
+      themeMeta.setAttribute("content", themeColors[theme]);
+    }
+
+    updateToggleState(theme);
+
+    if (persist) {
+      try {
+        localStorage.setItem(storageKey, theme);
+      } catch {}
+    }
+  };
+
+  const syncThemeFromPreference = () => {
+    applyTheme(getStoredTheme() ?? getSystemTheme());
+  };
+
+  syncThemeFromPreference();
+
+  const handleSystemChange = (event) => {
+    if (getStoredTheme()) {
+      return;
+    }
+
+    applyTheme(event.matches ? "dark" : "light");
+  };
+
+  if (typeof mediaQuery.addEventListener === "function") {
+    mediaQuery.addEventListener("change", handleSystemChange);
+  } else if (typeof mediaQuery.addListener === "function") {
+    mediaQuery.addListener(handleSystemChange);
+  }
+
+  const attachToggle = () => {
+    const toggle = document.querySelector("[data-theme-toggle]");
+    if (!toggle) {
+      return;
+    }
+
+    updateToggleState(root.dataset.theme === "dark" ? "dark" : "light");
+    toggle.addEventListener("click", () => {
+      const currentTheme = root.dataset.theme === "dark" ? "dark" : "light";
+      const nextTheme = currentTheme === "dark" ? "light" : "dark";
+      applyTheme(nextTheme, true);
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", attachToggle, { once: true });
+  } else {
+    attachToggle();
+  }
+
+  window.addEventListener("storage", (event) => {
+    if (event.key !== storageKey) {
+      return;
+    }
+
+    syncThemeFromPreference();
+  });
+})();
+`;
 
 function isCurrent(href: string) {
   const target = withBase(href);
@@ -68,6 +166,7 @@ function isCurrent(href: string) {
       jsonLd={jsonLd}
       noindex={noindex}
     />
+    <script is:inline set:html={themeScript}></script>
   </head>
   <body>
     <a class="skip-link" href="#content">Skip to content</a>
@@ -85,15 +184,59 @@ function isCurrent(href: string) {
           </span>
         </a>
 
-        <nav class="site-nav" aria-label="Primary">
-          {
-            siteConfig.navigation.map((item) => (
-              <a class:list={[isCurrent(item.href) && "is-active"]} href={withBase(item.href)}>
-                {item.label}
-              </a>
-            ))
-          }
-        </nav>
+        <div class="site-header__actions">
+          <nav class="site-nav" aria-label="Primary">
+            {
+              siteConfig.navigation.map((item) => (
+                <a class:list={[isCurrent(item.href) && "is-active"]} href={withBase(item.href)}>
+                  {item.label}
+                </a>
+              ))
+            }
+          </nav>
+
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Switch theme"
+            title="Switch theme"
+          >
+            <span class="theme-toggle__icons" aria-hidden="true">
+              <svg
+                class="theme-toggle__icon theme-toggle__icon--sun"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              >
+                <circle cx="12" cy="12" r="3.75"></circle>
+                <path d="M12 2.75v2.5"></path>
+                <path d="M12 18.75v2.5"></path>
+                <path d="M4.75 12h2.5"></path>
+                <path d="M16.75 12h2.5"></path>
+                <path d="M5.9 5.9l1.8 1.8"></path>
+                <path d="M16.3 16.3l1.8 1.8"></path>
+                <path d="M18.1 5.9l-1.8 1.8"></path>
+                <path d="M7.7 16.3l-1.8 1.8"></path>
+              </svg>
+
+              <svg
+                class="theme-toggle__icon theme-toggle__icon--moon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              >
+                <path d="M20.2 14.1A8.6 8.6 0 0 1 9.9 3.8a8.6 8.6 0 1 0 10.3 10.3Z"></path>
+              </svg>
+            </span>
+          </button>
+        </div>
       </header>
 
       <main id="content" class="site-main">

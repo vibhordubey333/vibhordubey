@@ -10,12 +10,13 @@ const siteConfig = {
   dateLocale: "en-IN",
   rssPath: "/rss.xml",
   defaultOgImage: "/og/default-social.svg",
+  themeColors: {
+    light: "#f6f3ee",
+    dark: "#0e1317"
+  },
   navigation: [
-    { label: "Home", href: "/" },
     { label: "Blog", href: "/blog/" },
-    { label: "About", href: "/about/" },
-    { label: "Tags", href: "/tags/" },
-    { label: "RSS", href: "/rss.xml" }
+    { label: "About", href: "/about/" }
   ],
   author: {
     name: "Vibhor Dubey",

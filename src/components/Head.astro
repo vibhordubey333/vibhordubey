@@ -38,6 +38,7 @@ const canonicalUrl = absoluteUrl(canonicalPath, Astro.site ?? siteConfig.origin)
 const resolvedImage = absoluteUrl(image, Astro.site ?? siteConfig.origin);
 const rssUrl = absoluteUrl(siteConfig.rssPath, Astro.site ?? siteConfig.origin);
 const jsonLdBlocks = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
+const lightThemeColor = siteConfig.themeColors.light;
 ---
 
 <meta charset="utf-8" />
@@ -45,7 +46,8 @@ const jsonLdBlocks = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
 <meta name="generator" content={Astro.generator} />
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
-<meta name="theme-color" content="#f6f3ee" />
+<meta name="color-scheme" content="light dark" />
+<meta data-theme-color name="theme-color" content={lightThemeColor} />
 {noindex && <meta name="robots" content="noindex,nofollow" />}
 
 <link rel="icon" href={absoluteUrl("/favicon.svg", Astro.site ?? siteConfig.origin)} />
