@@ -20,8 +20,8 @@ const siteConfig = {
   ],
   author: {
     name: "Vibhor Dubey",
-    role: "Senior Backend Engineer",
-    bio: "I build distributed systems that handle high volume load and stay up. Over 8+ years, I have worked across event-driven pipelines, high-throughput APIs, and cloud-native infrastructure, primarily in Go and Java Spring Boot. Most of my work sits at the intersection of distributed systems and observability: designing for failure, reducing MTTD, and making production less surprising.",
+    role: "Software Engineer",
+    bio: "I am a Software Engineer with 8+ years of experience designing, building, and operating scalable cloud-native backend systems that handle 10k+ RPS. My work focuses on high-performance REST/gRPC/GraphQL APIs, event-driven architectures (Kafka/NATS), and improving reliability, observability, and deployment efficiency using AWS, Terraform, Kubernetes, and CI/CD.",
     url: "https://github.com/vibhordubey333",
     email: "mailto:hello@vibhordubey.dev"
   },

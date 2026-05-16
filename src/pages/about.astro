@@ -1,6 +1,5 @@
 ---
 import AuthorBio from "../components/AuthorBio.astro";
-import Prose from "../components/Prose.astro";
 import siteConfig from "../config/site";
 import { absoluteUrl } from "../lib/url";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -22,19 +21,5 @@ const jsonLd = {
   canonicalPath="/about/"
   jsonLd={jsonLd}
 >
-  <Prose>
-    <p>
-      I am a Senior Backend Engineer building distributed systems that handle high volume load and
-      stay up. Over 8+ years, I have worked across event-driven pipelines, high-throughput APIs,
-      and cloud-native infrastructure, primarily in Go and Java Spring Boot.
-    </p>
-    <p>
-      Most of my work lives at the intersection of distributed systems and observability:
-      designing for failure, reducing MTTD, and making production less surprising. Most of what
-      appears here starts from working notes, turns into a practical draft, and eventually becomes
-      something worth syndicating.
-    </p>
-  </Prose>
-
   <AuthorBio />
 </BaseLayout>

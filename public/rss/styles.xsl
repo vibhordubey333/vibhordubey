@@ -76,7 +76,7 @@
         <div class="header">
           <h1><xsl:value-of select="/rss/channel/title"/></h1>
           <p class="description"><xsl:value-of select="/rss/channel/description"/></p>
-          <a href="{/rss/channel/link}">Visit Website &#x2192;</a>
+          <a href="/vibhordubey/">Visit Website &#x2192;</a>
         </div>
 
         <div class="items">
