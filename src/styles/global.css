@@ -395,7 +395,6 @@ textarea:focus-visible {
 }
 
 .hero h1 {
-  max-width: 11ch;
   font-size: clamp(2.8rem, 7vw, 5.4rem);
 }
 
@@ -404,7 +403,7 @@ textarea:focus-visible {
 .section-heading p,
 .post-header__lede,
 .not-found p {
-  max-width: 62ch;
+  max-width: 80ch;
   color: var(--muted);
   font-size: clamp(1.02rem, 1.4vw, 1.12rem);
 }
@@ -594,7 +593,6 @@ textarea:focus-visible {
 }
 
 .post-header h1 {
-  max-width: 14ch;
   font-size: clamp(2.4rem, 6vw, 4.6rem);
 }
 
@@ -607,8 +605,8 @@ textarea:focus-visible {
 }
 
 .prose {
-  max-width: 72ch;
-  font-size: 1.03rem;
+  max-width: 80ch;
+  font-size: 1.15rem;
 }
 
 .prose > :first-child {
@@ -715,7 +713,7 @@ textarea:focus-visible {
 }
 
 .author-bio--compact {
-  max-width: 72ch;
+  max-width: 80ch;
 }
 
 .author-bio__name {
@@ -745,7 +743,7 @@ textarea:focus-visible {
 }
 
 .syndication {
-  max-width: 72ch;
+  max-width: 80ch;
 }
 
 .site-footer {
