@@ -1,14 +1,12 @@
 ---
-import AuthorBio from "../components/AuthorBio.astro";
-import PostCard from "../components/PostCard.astro";
 import siteConfig from "../config/site";
-import { getPublishedPosts, getTagCollection } from "../lib/posts";
+import { getPublishedPosts, formatDate } from "../lib/posts";
 import { absoluteUrl, withBase } from "../lib/url";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import AuthorBio from "../components/AuthorBio.astro";
 
 const posts = await getPublishedPosts();
-const recentPosts = posts.slice(0, 3);
-const tagHighlights = getTagCollection(posts).slice(0, 6);
+const recentPosts = posts.slice(0, 10);
 
 const jsonLd = [
   {
@@ -35,51 +33,25 @@ const jsonLd = [
   canonicalPath="/"
   jsonLd={jsonLd}
 >
-  <section class="hero">
-    <p class="hero__eyebrow">POSSE technical writing, without platform lock-in</p>
-    <h1>Publish thoughtfully. Keep the original on your own site.</h1>
-    <p class="hero__lede">
-      Tutorials, frontend notes, essays, and quiet engineering lessons collected in one place,
-      then syndicated outward with clear canonical ownership.
-    </p>
-
-    <div class="hero__actions">
-      <a class="button" href={withBase("/blog/")}>Read the blog</a>
-      <a class="button button--secondary" href={withBase("/about/")}>About the author</a>
-    </div>
-  </section>
+  <AuthorBio />
 
   <section class="section-block">
     <div class="section-heading">
-      <p class="section-heading__eyebrow">Recent writing</p>
-      <h2>Fresh posts from the notebook</h2>
+      <h2>Recent blog posts <span style="font-size: 1.2rem; margin: 0 0.5rem; color: var(--muted);">&bull;</span> <a href={withBase("/blog/")} style="font-size: 1.2rem; font-family: var(--font-sans); font-weight: normal;">Full archive &rarr;</a></h2>
+      <p>Things I have written recently.</p>
     </div>
 
-    <div class="post-grid">
-      {recentPosts.map((post) => <PostCard post={post} />)}
-    </div>
-  </section>
-
-  <section class="section-block section-block--split">
-    <div class="section-heading">
-      <p class="section-heading__eyebrow">Topics</p>
-      <h2>Organized for reading, not for clutter</h2>
-      <p>
-        Tags stay lightweight so the archive remains easy to scan and quick to maintain.
-      </p>
-    </div>
-
-    <div class="pill-grid">
-      {
-        tagHighlights.map((tag) => (
-          <a class="tag-panel" href={withBase(`/tags/${tag.slug}/`)}>
-            <strong>{tag.label}</strong>
-            <span>{tag.count} post{tag.count === 1 ? "" : "s"}</span>
+    <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+      {recentPosts.map((post) => (
+        <li style="font-size: 1.1rem; color: var(--text);">
+          <span style="font-family: var(--font-mono); color: var(--muted); font-size: 0.95rem; margin-right: 0.5rem;">
+            {formatDate(post.data.pubDate)} :
+          </span>
+          <a href={withBase(`/blog/${post.id}/`)} style="text-decoration: none;">
+            {post.data.title}
           </a>
-        ))
-      }
-    </div>
+        </li>
+      ))}
+    </ul>
   </section>
-
-  <AuthorBio />
 </BaseLayout>

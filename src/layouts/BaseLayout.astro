@@ -175,8 +175,6 @@ function isCurrent(href: string) {
       <header class="site-header">
         <a class="brand" href={homeHref}>
           <span class="brand__mark" aria-hidden="true">
-            <span>{`{`}</span>
-            <span>{`}`}</span>
           </span>
           <strong class="brand__name">{siteConfig.author.name}</strong>
         </a>
@@ -241,10 +239,6 @@ function isCurrent(href: string) {
       </main>
 
       <footer class="site-footer">
-        <p>
-          <strong>{siteConfig.author.name}</strong> publishes here first, then syndicates elsewhere
-          with canonical links intact.
-        </p>
         <ul class="social-links" aria-label="Footer links">
           {
             siteConfig.socialLinks.map((link) => (
