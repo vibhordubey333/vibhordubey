@@ -8,7 +8,6 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: siteConfig.author.name,
-  jobTitle: siteConfig.author.role,
   description: siteConfig.author.bio,
   url: absoluteUrl("/about/", Astro.site ?? siteConfig.origin),
   sameAs: [siteConfig.author.url]

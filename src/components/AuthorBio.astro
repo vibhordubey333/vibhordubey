@@ -12,7 +12,6 @@ const { compact = false } = Astro.props;
 <aside class:list={["author-bio", compact && "author-bio--compact"]}>
   <div class="author-bio__copy">
     <h2 class="author-bio__name">{siteConfig.author.name}</h2>
-    <p class="author-bio__role">{siteConfig.author.role}</p>
     <p class="author-bio__text">{siteConfig.author.bio}</p>
   </div>
 </aside>
