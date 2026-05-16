@@ -68,6 +68,11 @@ const jsonLd = {
       <p class="post-header__eyebrow">Blog</p>
       <h1>{post.data.title}</h1>
       <p class="post-header__lede">{post.data.description}</p>
+      {post.data.stats && (
+        <div class="hero-meta" style="justify-content: flex-start; margin-bottom: 1rem; margin-top: 0.5rem;">
+          {post.data.stats.map(stat => <span>{stat}</span>)}
+        </div>
+      )}
 
       <div class="post-header__meta">
         <span>{formatDate(post.data.pubDate)}</span>
