@@ -16,7 +16,8 @@ export function sortPosts(posts: BlogEntry[]) {
 }
 
 export async function getPublishedPosts() {
-  const posts = await getCollection("blog", ({ data }) => import.meta.env.DEV || !data.draft);
+  const isDev = process.env.DEV === 'true' || import.meta.env?.DEV;
+  const posts = await getCollection("blog", ({ data }) => isDev || !data.draft);
   return sortPosts(posts);
 }
 

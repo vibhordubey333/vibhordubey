@@ -13,5 +13,17 @@ export default defineConfig({
       },
       wrap: true
     }
+  },
+  vite: {
+    server: {
+      watch: {
+        ignored: ['**/*.test.ts', '**/*.test.tsx']
+      }
+    },
+    build: {
+      rollupOptions: {
+        external: ['vitest']
+      }
+    }
   }
 });
