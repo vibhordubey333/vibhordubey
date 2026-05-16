@@ -8,11 +8,6 @@ tags:
   - Database
 category: Engineering
 type: tutorial
-stats:
-  - "📖 ~25 min read"
-  - "🎯 Beginner → Expert"
-  - "🐘 PostgreSQL 14+"
-  - "🐬 MySQL 8.0+"
 ---
 
 
