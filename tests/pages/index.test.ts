@@ -40,7 +40,6 @@ describe('Home Page', () => {
     
     // Check if AuthorBio is rendered
     expect(result).toContain('Vibhor Dubey');
-    expect(result).toContain('Software Engineer');
     
     // Check if recent posts are rendered
     expect(result).toContain('Recent blog posts');
