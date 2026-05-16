@@ -41,15 +41,18 @@ const jsonLd = [
       <p>Things I have written recently.</p>
     </div>
 
-    <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+    <ul style="list-style: none; padding-left: 0; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
       {recentPosts.map((post) => (
-        <li style="font-size: 1.1rem; color: var(--text);">
-          <span style="font-family: var(--font-mono); color: var(--muted); font-size: 0.95rem; margin-right: 0.5rem;">
-            {formatDate(post.data.pubDate)} :
+        <li style="font-size: 1.1rem; color: var(--text); display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;">
+          <span style="font-family: var(--font-mono); color: var(--accent); font-weight: bold;">
+            &gt;_
           </span>
-          <a href={withBase(`/blog/${post.id}/`)} style="text-decoration: none;">
+          <a href={withBase(`/blog/${post.id}/`)} style="text-decoration: none; font-weight: 500;">
             {post.data.title}
           </a>
+          <span style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-left: 0.5rem;">
+            {formatDate(post.data.pubDate)}
+          </span>
         </li>
       ))}
     </ul>

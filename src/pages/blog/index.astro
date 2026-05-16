@@ -11,13 +11,7 @@ const posts = await getPublishedPosts();
   description="Technical blog posts published on the canonical site first."
   canonicalPath="/blog/"
 >
-  <section class="page-intro">
-    <p class="section-heading__eyebrow">Archive</p>
-    <h1>Technical writing with a durable home.</h1>
-    <p>{posts.length} published blog posts.</p>
-  </section>
-
   <div class="post-grid">
-    {posts.map((post) => <PostCard post={post} />)}
+    {posts.slice(0, 5).map((post) => <PostCard post={post} />)}
   </div>
 </BaseLayout>
