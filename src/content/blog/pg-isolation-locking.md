@@ -64,9 +64,9 @@ stats:
 <div class="section" id="mvcc">
 <h2>How PostgreSQL Actually Works: MVCC</h2>
 
-<p>Before isolation levels make sense, you need to understand what's underneath. PostgreSQL uses <strong>Multi-Version Concurrency Control (MVCC)</strong>. Instead of locking rows when you read them, PostgreSQL keeps multiple versions of every row simultaneously.</p>
+<p>Before isolation levels make sense, you need to understand what's underneath. PostgreSQL uses <strong>Multi-Version Concurrency Control (MVCC)</strong>. Instead of freezing a row with a lock every time someone reads it, PostgreSQL keeps multiple versions of every row simultaneously.</p>
 
-<p>Every row in a PostgreSQL heap has two hidden system columns:</p>
+<p>To see how this works in practice, we can peek under the hood. Every row in a PostgreSQL heap has two hidden system columns:</p>
 <ul>
   <li><code>xmin</code>: the transaction ID (XID) that created this row version</li>
   <li><code>xmax</code>: the transaction ID that deleted or updated this row version (0 if the row is still live)</li>
@@ -119,7 +119,7 @@ balance <span class="kw">NUMERIC</span>(12,2) <span class="kw">NOT NULL DEFAULT<
 <div class="section" id="phenomena">
 <h2>The Six Read Anomalies</h2>
 
-<p>These are the specific bugs that emerge when transactions run concurrently without proper isolation. The SQL standard names four of them; in practice you'll run into six.</p>
+<p>These are the subtle concurrency bugs that will page you at 2 AM if your isolation levels are wrong. The SQL standard names four of them, but out in the wild, you'll run into six.</p>
 
 <!-- 1. DIRTY READ -->
 <h3>1. Dirty Read</h3>
@@ -151,7 +151,7 @@ balance <span class="kw">NUMERIC</span>(12,2) <span class="kw">NOT NULL DEFAULT<
 </div>
 
 <div class="callout success">
-  Worth noting: neither PostgreSQL nor MySQL (InnoDB) ever produce dirty reads, even at <code>READ UNCOMMITTED</code>. PostgreSQL treats that level identically to READ COMMITTED. MySQL's InnoDB behaves the same way in practice.
+  Worth noting: PostgreSQL never produces dirty reads, even at <code>READ UNCOMMITTED</code>. It simply treats that level identically to READ COMMITTED. However, MySQL's InnoDB <strong>does</strong> allow dirty reads at this level, and will actually let you read uncommitted data from other transactions.
 </div>
 
 <!-- 2. DIRTY WRITE -->
@@ -187,9 +187,9 @@ balance <span class="kw">NUMERIC</span>(12,2) <span class="kw">NOT NULL DEFAULT<
       </div>
     </div>
 
-    <div class="code-block" style="margin-top:16px">
-      <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span>PostgreSQL: Reproduce non-repeatable read</span></div>
-      <pre><span class="cmt">-- Session 1 (READ COMMITTED — default)</span>
+<div class="code-block" style="margin-top:16px">
+  <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span>PostgreSQL: Reproduce non-repeatable read</span></div>
+  <pre><span class="cmt">-- Session 1 (READ COMMITTED — default)</span>
 <span class="kw">BEGIN</span>;
 <span class="kw">SELECT</span> balance <span class="kw">FROM</span> <span class="table-name">accounts</span> <span class="kw">WHERE</span> id <span class="op">=</span> <span class="num">1</span>;
 <span class="cmt">-- → 10000.00</span>
@@ -199,7 +199,7 @@ balance <span class="kw">NUMERIC</span>(12,2) <span class="kw">NOT NULL DEFAULT<
 <span class="kw">SELECT</span> balance <span class="kw">FROM</span> <span class="table-name">accounts</span> <span class="kw">WHERE</span> id <span class="op">=</span> <span class="num">1</span>;
 <span class="cmt">-- → 3000.00  ← DIFFERENT VALUE! Non-repeatable read.</span>
 <span class="kw">COMMIT</span>;</pre>
-    </div>
+</div>
   </div>
 </div>
 
@@ -257,8 +257,7 @@ created_at <span class="kw">TIMESTAMPTZ DEFAULT NOW</span>()
         <div class="txn-step error"><span class="step-time">T6</span> UPDATE products SET stock=2 WHERE id=42;<br>COMMIT; <span class="cmt">-- 5-3=2, OVERWRITES T1!</span></div>
       </div>
     </div>
-    <p style="margin-top:14px; font-size:14px; color: var(--danger);">⚠ Result: stock=2, but should be 0. Customer 1's purchase was silently overwritten. You've oversold by 2 items.</p>
-  </div>
+  <p style="margin-top:14px; font-size:14px; color: var(--danger);">⚠ Result: stock=2, but should be 0. Customer 1's purchase was silently overwritten. You've oversold by 2 items.</p>
 </div>
 
 <!-- 6. WRITE SKEW -->
@@ -332,7 +331,7 @@ on_call  <span class="kw">BOOLEAN DEFAULT TRUE</span>
         <td><span class="level-name">REPEATABLE READ</span></td>
         <td><span class="cell-no">Never</span></td>
         <td><span class="cell-no">Never</span></td>
-        <td><span class="cell-yes">Possible</span> <span class="cell-pg">(PG: never)</span></td>
+        <td><span class="cell-yes">Possible</span> <span class="cell-pg">(PG &amp; MySQL: almost never)</span></td>
         <td><span class="cell-yes">Yes</span></td>
         <td>⚡⚡</td>
       </tr>
@@ -396,7 +395,7 @@ on_call  <span class="kw">BOOLEAN DEFAULT TRUE</span>
 
 <div class="mysql-note">
   <div class="mysql-badge">MySQL</div>
-  <div>MySQL's REPEATABLE READ takes the snapshot at the first read, same concept. However, MySQL does NOT prevent phantom reads at this level (unlike PostgreSQL). You need gap locks or SERIALIZABLE to prevent phantoms in MySQL. This is a significant behavioral difference.</div>
+  <div>MySQL's REPEATABLE READ takes the snapshot at the first read, same concept. Furthermore, InnoDB <strong>does</strong> prevent phantom reads by default at this level in most cases. For plain reads, it uses the MVCC snapshot. For locking reads (like <code>FOR UPDATE</code>), it automatically applies next-key and gap locks to prevent concurrent inserts.</div>
 </div>
 
 <!-- SERIALIZABLE -->
@@ -895,6 +894,10 @@ id      <span class="op">=</span> <span class="num">1</span>
 -- theoretically weaker than an integer version counter.
 -- Prefer integer versions in high-concurrency systems.</span></pre>
 </div>
+
+<div class="callout info">
+  <strong>Working with an ORM?</strong> You usually don't have to write this SQL by hand. Modern ORMs like Hibernate, Prisma, Entity Framework, and ActiveRecord have built-in support for optimistic locking. You just flag a column as <code>@Version</code>, and the ORM automatically injects the version check and throws an <code>OptimisticLockException</code> if a conflict occurs.
+</div>
 </div>
 
 <div class="divider"></div>
@@ -1027,7 +1030,7 @@ blocking.query      <span class="kw">AS</span> blocking_query
       <tr>
         <td>Phantom reads at REPEATABLE READ</td>
         <td><span class="cell-no">Not possible</span> (snapshot covers it)</td>
-        <td><span class="cell-yes">Possible</span> (gap locks partially prevent, but not fully)</td>
+        <td><span class="cell-no">Almost never</span> (MVCC for plain reads, gap locks for locking reads)</td>
       </tr>
       <tr>
         <td>READ UNCOMMITTED dirty reads</td>
@@ -1156,7 +1159,7 @@ blocking.query      <span class="kw">AS</span> blocking_query
     <tbody>
       <tr><td>Dirty reads</td><td><code>READ COMMITTED</code> (default in PG)</td></tr>
       <tr><td>Non-repeatable reads</td><td><code>REPEATABLE READ</code></td></tr>
-      <tr><td>Phantom reads</td><td><code>REPEATABLE READ</code> in PG; <code>SERIALIZABLE</code> in MySQL</td></tr>
+      <tr><td>Phantom reads</td><td><code>REPEATABLE READ</code> in both PG and MySQL InnoDB</td></tr>
       <tr><td>Lost updates</td><td><code>SELECT ... FOR UPDATE</code> or <code>REPEATABLE READ</code> (PG detects conflict)</td></tr>
       <tr><td>Write skew</td><td><code>SERIALIZABLE</code> only</td></tr>
       <tr><td>Deadlocks</td><td>Consistent lock ordering + short transactions</td></tr>
