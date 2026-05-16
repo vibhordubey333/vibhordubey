@@ -1,6 +1,6 @@
 ---
 title: "Transactions, Isolation & Locks: A PostgreSQL and MySQL Guide"
-description: "From dirty reads to MVCC internals, deadlock detection, and production locking patterns. Runnable SQL for every concept."
+description: "A comprehensive guide to PostgreSQL and MySQL transactions, isolation levels, and locking."
 pubDate: 2026-05-15
 tags:
   - PostgreSQL
@@ -39,6 +39,8 @@ stats:
 </div>
 
 <!-- SECTION 1: THE PROBLEM -->
+<p>From dirty reads to MVCC internals, deadlock detection, and production locking patterns. Runnable SQL for every concept.</p>
+
 <div class="section" id="the-problem">
 <h2>The Concurrency Problem</h2>
 
