@@ -1,6 +1,5 @@
 ---
 import { render } from "astro:content";
-import AuthorBio from "../../components/AuthorBio.astro";
 import Prose from "../../components/Prose.astro";
 import SyndicationLinks from "../../components/SyndicationLinks.astro";
 import TagList from "../../components/TagList.astro";
@@ -84,6 +83,5 @@ const jsonLd = {
     </Prose>
 
     <SyndicationLinks links={post.data.syndicatedTo} />
-    <AuthorBio compact={true} />
   </article>
 </BaseLayout>

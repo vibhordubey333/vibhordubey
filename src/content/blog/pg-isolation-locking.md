@@ -15,7 +15,7 @@ type: tutorial
 
 
 <!-- HERO -->
-
+<div class="hero">
 <h1>Transactions, Isolation Levels<br>& <em>Locks</em></h1>
 <p class="hero-sub">From dirty reads to MVCC internals, deadlock detection, and production locking patterns. Runnable SQL for every concept.</p>
 <div class="hero-meta">
@@ -26,7 +26,7 @@ type: tutorial
 </div>
 </div>
 
-<div class="container">
+<div class="toc-wrapper">
 
 <!-- TOC -->
 
@@ -1100,6 +1100,9 @@ blocking.query      <span class="kw">AS</span> blocking_query
 <h3>Choosing an isolation level</h3>
 
 
+<div class="summary-grid">
+  <div class="summary-card">
+    <div class="level">READ COMMITTED</div>
     <div class="perf" style="color: var(--accent3)">Default</div>
     <div class="desc">General-purpose. Use for most reads and writes. Add explicit locks where needed.</div>
   </div>
@@ -1164,11 +1167,6 @@ blocking.query      <span class="kw">AS</span> blocking_query
     </tbody>
   </table>
 </div>
-</div>
-
-</div>
-
-
 </div>
 
 <script>

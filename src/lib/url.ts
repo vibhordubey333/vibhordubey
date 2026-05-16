@@ -5,9 +5,11 @@ export function withBase(path = "/") {
     return path;
   }
 
-  const base = import.meta.env.BASE_URL.endsWith("/")
-    ? import.meta.env.BASE_URL.slice(0, -1)
-    : import.meta.env.BASE_URL;
+  // Use process.env for Vitest, fallback to import.meta.env for Astro
+  const baseEnv = process.env.BASE_URL || import.meta.env?.BASE_URL || "/";
+  const base = baseEnv.endsWith("/")
+    ? baseEnv.slice(0, -1)
+    : baseEnv;
   const normalized = path.startsWith("/") ? path : `/${path}`;
 
   if (normalized === "/") {
