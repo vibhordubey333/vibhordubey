@@ -1,5 +1,7 @@
 # Field Notes by Vibhor Dubey
 
+**Live at:** [https://vibhordubey333.github.io/vibhordubey](https://vibhordubey333.github.io/vibhordubey)
+
 A POSSE-style technical blog built with [Astro](https://astro.build/) and deployed on GitHub Pages.
 
 The publishing model is simple:
