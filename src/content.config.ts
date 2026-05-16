@@ -14,6 +14,7 @@ const blog = defineCollection({
     category: z.string().optional(),
     type: z.enum(["tutorial", "note", "essay"]).optional(),
     heroImage: z.string().optional(),
+    stats: z.array(z.string()).optional(),
     syndicatedTo: z
       .array(
         z.object({

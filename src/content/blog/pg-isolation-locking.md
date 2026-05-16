@@ -8,23 +8,17 @@ tags:
   - Database
 category: Engineering
 type: tutorial
+stats:
+  - "📖 ~25 min read"
+  - "🎯 Beginner → Expert"
+  - "🐘 PostgreSQL 14+"
+  - "🐬 MySQL 8.0+"
 ---
 
 
 
 
 
-<!-- HERO -->
-<div class="hero">
-<h1>Transactions, Isolation Levels<br>& <em>Locks</em></h1>
-<p class="hero-sub">From dirty reads to MVCC internals, deadlock detection, and production locking patterns. Runnable SQL for every concept.</p>
-<div class="hero-meta">
-<span>📖 ~25 min read</span>
-<span>🎯 Beginner → Expert</span>
-<span>🐘 PostgreSQL 14+</span>
-<span>🐬 MySQL 8.0+</span>
-</div>
-</div>
 
 <div class="toc-wrapper">
 
