@@ -10,6 +10,7 @@ const siteConfig = {
   dateLocale: "en-IN",
   rssPath: "/rss.xml",
   defaultOgImage: "/og/default-social.svg",
+  googleAnalyticsId: "G-XXXXXXXXXX", // TODO: Replace with your actual Measurement ID
   themeColors: {
     light: "#f6f3ee",
     dark: "#0e1317"

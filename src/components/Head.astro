@@ -39,6 +39,7 @@ const resolvedImage = absoluteUrl(image, Astro.site ?? siteConfig.origin);
 const rssUrl = absoluteUrl(siteConfig.rssPath, Astro.site ?? siteConfig.origin);
 const jsonLdBlocks = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
 const lightThemeColor = siteConfig.themeColors.light;
+const gaId = siteConfig.googleAnalyticsId;
 ---
 
 <meta charset="utf-8" />
@@ -81,3 +82,15 @@ const lightThemeColor = siteConfig.themeColors.light;
     <script is:inline type="application/ld+json" set:html={JSON.stringify(entry)} />
   ))
 }
+
+{gaId && (
+  <>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+    <script is:inline define:vars={{ gaId }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', gaId);
+    </script>
+  </>
+)}
