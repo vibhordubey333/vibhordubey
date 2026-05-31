@@ -28,7 +28,15 @@ const siteConfig = {
   socialLinks: [
     { label: "GitHub", href: "https://github.com/vibhordubey333" },
     { label: "RSS", href: "/rss.xml" }
-  ]
+  ],
+  giscus: {
+    enabled: true,
+    repo: "vibhordubey333/vibhordubey",
+    // Get repoId and categoryId from https://giscus.app after enabling GitHub Discussions
+    repoId: "R_kgDOSUjrtA",
+    category: "Comments",
+    categoryId: "DIC_kwDOSUjrtM4C-NN6",
+  }
 } as const;
 
 export default siteConfig;
