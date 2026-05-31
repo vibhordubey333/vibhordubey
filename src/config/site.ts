@@ -33,9 +33,9 @@ const siteConfig = {
     enabled: true,
     repo: "vibhordubey333/vibhordubey",
     // Get repoId and categoryId from https://giscus.app after enabling GitHub Discussions
-    repoId: "REPLACE_WITH_REPO_ID",
+    repoId: "R_kgDOSUjrtA",
     category: "Comments",
-    categoryId: "REPLACE_WITH_CATEGORY_ID",
+    categoryId: "DIC_kwDOSUjrtM4C-NN6",
   }
 } as const;
 
