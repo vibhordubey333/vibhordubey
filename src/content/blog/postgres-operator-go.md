@@ -603,7 +603,7 @@ spec:
 ```go
 // Package v1alpha1 contains API Schema definitions for the postgres v1alpha1 API group
 // +kubebuilder:object:generate=true
-// +groupName=postgres.example.com
+// +groupName=postgres.vibhordubey.com
 package v1alpha1
 
 import (
@@ -835,12 +835,13 @@ const (
 
 type PostgresDatabaseReconciler struct {
     client.Client
-    Scheme *runtime.Scheme
+    Scheme    *runtime.Scheme
+    DBSSLMode string
 }
 
-// +kubebuilder:rbac:groups=postgres.example.com,resources=postgresdatabases,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=postgres.example.com,resources=postgresdatabases/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=postgres.example.com,resources=postgresdatabases/finalizers,verbs=update
+// +kubebuilder:rbac:groups=postgres.vibhordubey.com,resources=postgresdatabases,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=postgres.vibhordubey.com,resources=postgresdatabases/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=postgres.vibhordubey.com,resources=postgresdatabases/finalizers,verbs=update
 // +kubebuilder:rbac:groups=apps,resources=statefulsets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=core,resources=services;persistentvolumeclaims;secrets,verbs=get;list;watch;create;update;patch;delete
 
@@ -875,6 +876,9 @@ func (r *PostgresDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Req
         if err := r.setPhase(ctx, db, postgresv1alpha1.PhaseProvisioning); err != nil {
             return ctrl.Result{}, err
         }
+        // Return early. The status update will trigger a new reconcile loop with the updated ResourceVersion,
+        // avoiding conflict errors when updating status again later in the same reconcile pass.
+        return ctrl.Result{}, nil
     }
 
     // 5. Reconcile credentials Secret (create only if absent)
@@ -940,7 +944,7 @@ func (r *PostgresDatabaseReconciler) reconcileSecret(
     }
     err := r.Get(ctx, name, secret)
     if errors.IsNotFound(err) {
-        secret = postgres.BuildSecret(db)
+        secret = postgres.BuildSecret(db, r.DBSSLMode)
         if setErr := controllerutil.SetControllerReference(db, secret, r.Scheme); setErr != nil {
             return nil, setErr
         }
@@ -1020,7 +1024,10 @@ func (r *PostgresDatabaseReconciler) setReady(
         Reason:             "Reconciled",
         Message:            "PostgresDatabase is ready",
     })
-    return ctrl.Result{RequeueAfter: requeueAfter}, r.Status().Update(ctx, db)
+    if err := r.Status().Update(ctx, db); err != nil {
+        return ctrl.Result{}, err
+    }
+    return ctrl.Result{RequeueAfter: requeueAfter}, nil
 }
 
 // setFailed marks the database as Failed and records the error condition.
@@ -1219,26 +1226,17 @@ import (
     "crypto/rand"
     "encoding/base64"
     "fmt"
-    "os"
 
+    postgresv1alpha1 "github.com/vibhordubey333/postgres-operator-go/api/v1alpha1"
     corev1 "k8s.io/api/core/v1"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-    postgresv1alpha1 "github.com/vibhordubey333/postgres-operator-go/api/v1alpha1"
 )
 
 // BuildSecret generates a Kubernetes Secret with random credentials.
 // Called only when the Secret does not already exist — idempotent by design.
-func BuildSecret(db *postgresv1alpha1.PostgresDatabase) *corev1.Secret {
+func BuildSecret(db *postgresv1alpha1.PostgresDatabase, sslMode string) *corev1.Secret {
     password := generatePassword(32)
     username := db.Spec.DatabaseName + "_user"
-
-    // sslMode is read from the DATABASE_SSLMODE environment variable.
-    // Set DATABASE_SSLMODE=disable in .env for local dev, DATABASE_SSLMODE=require for production.
-    // Defaults to "disable" if the variable is not set.
-    sslMode := os.Getenv("DATABASE_SSLMODE")
-    if sslMode == "" {
-        sslMode = "disable"
-    }
     dsn := fmt.Sprintf(
         "postgresql://%s:%s@%s-headless:5432/%s?sslmode=%s",
         username, password, db.Name, db.Spec.DatabaseName, sslMode,
@@ -1381,16 +1379,18 @@ func BuildService(db *postgresv1alpha1.PostgresDatabase) *corev1.Service {
 package main
 
 import (
-    "flag"; "os"
+    "flag"
+    "os"
+
+    postgresv1alpha1 "github.com/vibhordubey333/postgres-operator-go/api/v1alpha1"
+    "github.com/vibhordubey333/postgres-operator-go/internal/controller"
     "k8s.io/apimachinery/pkg/runtime"
-    utilruntime   "k8s.io/apimachinery/pkg/util/runtime"
+    utilruntime "k8s.io/apimachinery/pkg/util/runtime"
     clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-    ctrl    "sigs.k8s.io/controller-runtime"
+    ctrl "sigs.k8s.io/controller-runtime"
     "sigs.k8s.io/controller-runtime/pkg/healthz"
     "sigs.k8s.io/controller-runtime/pkg/log/zap"
     "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-    postgresv1alpha1 "github.com/vibhordubey333/postgres-operator-go/api/v1alpha1"
-    "github.com/vibhordubey333/postgres-operator-go/internal/controller"
 )
 
 var (
@@ -1406,37 +1406,60 @@ func init() {
 func main() {
     var metricsAddr, probeAddr, leaderElectionNamespace string
     var enableLeaderElection bool
-    flag.StringVar(&metricsAddr,             "metrics-bind-address",        ":8080",  "Metrics bind address")
-    flag.StringVar(&probeAddr,               "health-probe-bind-address",    ":8081",  "Health probe bind address")
-    flag.BoolVar (&enableLeaderElection,      "leader-elect",                 false,    "Enable leader election (set true in production)")
-    flag.StringVar(&leaderElectionNamespace,  "leader-election-namespace",    "",       "Namespace for leader election (required when leader-elect=true)")
+    flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "Metrics bind address")
+    flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "Health probe bind address")
+    flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election (set true in production)")
+    flag.StringVar(
+        &leaderElectionNamespace,
+        "leader-election-namespace",
+        "",
+        "Namespace for leader election (required when leader-elect=true)",
+    )
     opts := zap.Options{Development: true}
     opts.BindFlags(flag.CommandLine)
     flag.Parse()
     ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
     mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-        Scheme:                    scheme,
-        Metrics:                   server.Options{BindAddress: metricsAddr},
-        HealthProbeBindAddress:    probeAddr,
-        LeaderElection:            enableLeaderElection,
-        LeaderElectionID:          "postgres-operator-go.example.com",
-        LeaderElectionNamespace:   leaderElectionNamespace,
+        Scheme:                  scheme,
+        Metrics:                 server.Options{BindAddress: metricsAddr},
+        HealthProbeBindAddress:  probeAddr,
+        LeaderElection:          enableLeaderElection,
+        LeaderElectionID:        "postgres-operator-go.example.com",
+        LeaderElectionNamespace: leaderElectionNamespace,
     })
-    if err != nil { setupLog.Error(err, "unable to create manager"); os.Exit(1) }
-
-    if err = (&controller.PostgresDatabaseReconciler{
-        Client: mgr.GetClient(), Scheme: mgr.GetScheme(),
-    }).SetupWithManager(mgr); err != nil {
-        setupLog.Error(err, "unable to create controller"); os.Exit(1)
+    if err != nil {
+        setupLog.Error(err, "unable to create manager")
+        os.Exit(1)
     }
 
-    mgr.AddHealthzCheck("healthz", healthz.Ping)
-    mgr.AddReadyzCheck("readyz",  healthz.Ping)
+    dbSSLMode := os.Getenv("DATABASE_SSLMODE")
+    if dbSSLMode == "" {
+        dbSSLMode = "require"
+    }
+
+    if err = (&controller.PostgresDatabaseReconciler{
+        Client:    mgr.GetClient(),
+        Scheme:    mgr.GetScheme(),
+        DBSSLMode: dbSSLMode,
+    }).SetupWithManager(mgr); err != nil {
+        setupLog.Error(err, "unable to create controller")
+        os.Exit(1)
+    }
+
+    if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
+        setupLog.Error(err, "unable to add healthz check")
+        os.Exit(1)
+    }
+    if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
+        setupLog.Error(err, "unable to add readyz check")
+        os.Exit(1)
+    }
 
     setupLog.Info("starting manager")
     if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-        setupLog.Error(err, "problem running manager"); os.Exit(1)
+        setupLog.Error(err, "problem running manager")
+        os.Exit(1)
     }
 }
 ```
